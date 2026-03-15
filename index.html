@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Frequência</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+            --text-color: #333;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 { text-align: center; color: var(--primary-color); margin-bottom: 20px; }
+
+        /* Controles Principais */
+        .main-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-success { background: var(--success-color); color: white; }
+        .btn-danger { background: var(--danger-color); color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-pdf { background: #e74c3c; color: white; }
+        
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Busca de Semanas */
+        .search-week-section {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-week-section input[type="date"] {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        /* Bloco de Semana */
+        .week-block {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            background: #fff;
+        }
+
+        .week-header {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .week-title { font-size: 1.2rem; font-weight: bold; color: #444; }
+
+        /* Dashboard da Semana */
+        .week-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stat-item b { color: var(--primary-color); }
+
+        /* Tabela de Presença Responsiva */
+        .table-wrapper { overflow-x: auto; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 400px; }
+        th, td { padding: 10px; border: 1px solid var(--border-color); text-align: center; }
+        th { background: #f1f3f5; font-size: 0.85rem; }
+
+        .name-input { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; }
+        
+        select.cat-select { padding: 6px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.8rem; }
+
+        /* Botões Compactos ✔/❌ */
+        .btn-status {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 1rem;
+        }
+
+        .status-present { background: var(--success-color); color: white; }
+        .status-absent { background: var(--danger-color); color: white; }
+
+        /* Relatórios */
+        .report-area { margin-top: 40px; display: none; width: 100%; }
+        .report-card { background: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        
+        .cat-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            background: #eee;
+            margin-left: 5px;
+        }
+
+        .report-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .summary-box {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .summary-box h4 { margin: 0 0 10px 0; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        .summary-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+
+        /* Estilos de Impressão (PDF) */
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+            .main-controls, .search-week-section, #weeksContainer, .btn-pdf, .btn-danger, .btn-info, .btn-success, .btn-primary {
+                display: none !important;
+            }
+            .report-area { display: block !important; margin-top: 0; }
+            .report-card { break-inside: avoid; border: 1px solid #000; margin-bottom: 20px; }
+            h1, h2 { color: black; }
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .container { padding: 15px; }
+            th, td { padding: 6px; font-size: 0.8rem; }
+            .name-input { font-size: 0.85rem; }
+            .week-stats { flex-direction: column; align-items: center; }
+            .report-summary { grid-template-columns: 1fr; }
+        }
+
+        .hidden { display: none !important; }
+
+        #loadingOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <h3>Carregando dados do Firebase...</h3>
+    </div>
+
+    <div class="container">
+        <h1>Frequência Semanal (Firestore)</h1>
+        
+        <div class="main-controls">
+            <button class="btn-primary" onclick="window.addWeek()">+ Nova Semana</button>
+            <button class="btn-success" onclick="window.generateReport()">Gerar Relatório</button>
+            <button class="btn-danger" onclick="window.clearAll()">Limpar Tudo</button>
+        </div>
+
+        <div class="search-week-section">
+            <label>🔍 Buscar semana por data:</label>
+            <input type="date" id="searchDateInput" onchange="window.filterWeeksByDate()">
+            <button class="btn-info" style="padding: 5px 10px;" onclick="window.resetFilter()">Ver Todas</button>
+        </div>
+
+        <div id="weeksContainer">
+            <!-- Semanas serão renderizadas aqui -->
+        </div>
+
+        <div id="reportSection" class="report-area">
+            <hr>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">Relatório de Frequência</h2>
+                <button class="btn-pdf" onclick="window.print()">📄 Salvar PDF</button>
+            </div>
+            <div id="reportContent"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBKbFgrivWgaKkWsdM6qdgb3JPgRpa1yv4",
+            authDomain: "controle-de-fraquencia.firebaseapp.com",
+            projectId: "controle-de-fraquencia",
+            storageBucket: "controle-de-fraquencia.firebasestorage.app",
+            messagingSenderId: "1026228007121",
+            appId: "1:1026228007121:web:f454b77f3e99dea86655f0"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const weeksCollection = collection(db, "semanas");
+
+        const CATEGORIES = ["ORM", "JAS", "ADUL", "PRIM"];
+        let appData = { weeks: [] };
+
+        // --- FUNÇÕES DE INTERAÇÃO COM FIRESTORE ---
+
+        // Carregar dados em tempo real
+        const q = query(weeksCollection, orderBy("date", "asc"));
+        onSnapshot(q, (snapshot) => {
+            appData.weeks = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            renderAll();
+            document.getElementById('loadingOverlay').style.display = 'none';
+        });
+
+        async function addWeek() {
+            let nextDate = new Date();
+            if (appData.weeks.length > 0) {
+                const lastDate = new Date(appData.weeks[appData.weeks.length - 1].date);
+                lastDate.setDate(lastDate.getDate() + 7);
+                nextDate = lastDate;
+            }
+            const dateStr = nextDate.toISOString().split('T')[0];
+            
+            await addDoc(weeksCollection, {
+                date: dateStr,
+                records: [{ name: "", category: "ORM", present: true }]
+            });
+        }
+
+        async function addPerson(weekId) {
+            const week = appData.weeks.find(w => w.id === weekId);
+            const newRecords = [...week.records, { name: "", category: "ORM", present: true }];
+            await updateDoc(doc(db, "semanas", weekId), { records: newRecords });
+        }
+
+        async function removePerson(weekId, index) {
+            const week = appData.weeks.find(w => w.id === weekId);
+            const newRecords = [...week.records];
+            newRecords.splice(index, 1);
+            if (newRecords.length === 0) newRecords.push({ name: "", category: "ORM", present: true });
+            await updateDoc(doc(db, "semanas", weekId), { records: newRecords });
+        }
+
+        async function updateField(weekId, index, field, value) {
+            const week = appData.weeks.find(w => w.id === weekId);
+            const newRecords = [...week.records];
+            newRecords[index][field] = value;
+            await updateDoc(doc(db, "semanas", weekId), { records: newRecords });
+        }
+
+        async function updateWeekDate(weekId, newDate) {
+            await updateDoc(doc(db, "semanas", weekId), { date: newDate });
+        }
+
+        async function copyFromPrevious(weekId) {
+            const idx = appData.weeks.findIndex(w => w.id === weekId);
+            if (idx === 0) return alert("Não há semana anterior.");
+            const prev = appData.weeks[idx - 1];
+            if (confirm(`Copiar nomes de ${formatDate(prev.date)}?`)) {
+                const newRecords = prev.records.map(r => ({ ...r, present: true }));
+                await updateDoc(doc(db, "semanas", weekId), { records: newRecords });
+            }
+        }
+
+        async function clearWeek(weekId) {
+            if (confirm("Limpar esta semana?")) {
+                await updateDoc(doc(db, "semanas", weekId), {
+                    records: [{ name: "", category: "ORM", present: true }]
+                });
+            }
+        }
+
+        async function clearAll() {
+            if (confirm("Apagar TUDO do Firebase permanentemente?")) {
+                const snapshot = await getDocs(weeksCollection);
+                const deletePromises = snapshot.docs.map(d => deleteDoc(doc(db, "semanas", d.id)));
+                await Promise.all(deletePromises);
+                addWeek();
+            }
+        }
+
+        // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
+
+        function renderAll() {
+            const container = document.getElementById('weeksContainer');
+            container.innerHTML = '';
+
+            appData.weeks.forEach((week, wIdx) => {
+                const total = week.records.filter(r => r.name.trim() !== "").length;
+                const presents = week.records.filter(r => r.name.trim() !== "" && r.present).length;
+                const absents = total - presents;
+
+                const block = document.createElement('div');
+                block.className = 'week-block';
+                block.setAttribute('data-date', week.date);
+                
+                let rows = week.records.map((r, i) => `
+                    <tr>
+                        <td>
+                            <input type="text" class="name-input" value="${r.name}" 
+                                   onchange="window.updateField('${week.id}', ${i}, 'name', this.value)" placeholder="Nome...">
+                        </td>
+                        <td>
+                            <select class="cat-select" onchange="window.updateField('${week.id}', ${i}, 'category', this.value)">
+                                ${CATEGORIES.map(c => `<option value="${c}" ${r.category === c ? 'selected' : ''}>${c}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn-status ${r.present ? 'status-present' : 'status-absent'}" 
+                                    onclick="window.updateField('${week.id}', ${i}, 'present', ${!r.present})">
+                                ${r.present ? '✔' : '❌'}
+                            </button>
+                        </td>
+                        <td>
+                            <button class="btn-danger" style="padding: 5px; width: 30px;" onclick="window.removePerson('${week.id}', ${i})">&times;</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                block.innerHTML = `
+                    <div class="week-header">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div class="week-title">Semana - <input type="date" value="${week.date}" onchange="window.updateWeekDate('${week.id}', this.value)" style="border:none; font-size:1.1rem; font-weight:bold; color:#4a90e2; cursor:pointer;"></div>
+                            <div style="display: flex; gap: 5px;">
+                                ${wIdx > 0 ? `<button class="btn-info" style="font-size: 0.75rem; padding: 5px 10px;" onclick="window.copyFromPrevious('${week.id}')">📋 Copiar Anterior</button>` : ''}
+                                <button class="btn-primary" style="font-size: 0.75rem; padding: 5px 10px;" onclick="window.addPerson('${week.id}')">+ Nome</button>
+                                <button class="btn-danger" style="font-size: 0.75rem; padding: 5px 10px;" onclick="window.clearWeek('${week.id}')">Limpar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="week-stats">
+                        <div class="stat-item">Total: <b>${total}</b></div>
+                        <div class="stat-item">Presentes: <b style="color:var(--success-color)">${presents}</b></div>
+                        <div class="stat-item">Faltas: <b style="color:var(--danger-color)">${absents}</b></div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th style="width: 80px;">Cat.</th>
+                                    <th style="width: 60px;">Status</th>
+                                    <th style="width: 40px;">-</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
+                container.appendChild(block);
+            });
+        }
+
+        function generateReport() {
+            const reportContent = document.getElementById('reportContent');
+            reportContent.innerHTML = '';
+
+            appData.weeks.forEach(week => {
+                const total = week.records.filter(r => r.name.trim() !== "").length;
+                if (total === 0) return;
+
+                const presentCounts = {};
+                const absentCounts = {};
+                CATEGORIES.forEach(c => {
+                    presentCounts[c] = 0;
+                    absentCounts[c] = 0;
+                });
+                
+                const namesList = week.records
+                    .filter(r => r.name.trim() !== "")
+                    .map(r => {
+                        if (r.present) {
+                            presentCounts[r.category]++;
+                        } else {
+                            absentCounts[r.category]++;
+                        }
+                        return `<li>${r.name} <span class="cat-badge">${r.category}</span> - <b style="color:${r.present ? 'var(--success-color)' : 'var(--danger-color)'}">${r.present ? 'Presente' : 'Falta'}</b></li>`;
+                    }).join('');
+
+                const card = document.createElement('div');
+                card.className = 'report-card';
+                card.innerHTML = `
+                    <h3>Semana - ${formatDate(week.date)}</h3>
+                    <p><b>Total de pessoas:</b> ${total}</p>
+                    <div class="report-summary">
+                        <div class="summary-box">
+                            <h4>Resumo de Presentes</h4>
+                            <ul class="summary-list">
+                                ${CATEGORIES.map(c => `<li>${c}: <b>${presentCounts[c]}</b></li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="summary-box">
+                            <h4>Resumo de Faltas</h4>
+                            <ul class="summary-list">
+                                ${CATEGORIES.map(c => `<li>${c}: <b>${absentCounts[c]}</b></li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <hr>
+                    <ul style="padding-left: 20px;">${namesList}</ul>
+                `;
+                reportContent.appendChild(card);
+            });
+
+            document.getElementById('reportSection').style.display = 'block';
+            document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function formatDate(dateStr) {
+            const [y, m, d] = dateStr.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
+        // Exportar funções para o escopo global (window)
+        window.addWeek = addWeek;
+        window.addPerson = addPerson;
+        window.removePerson = removePerson;
+        window.updateField = updateField;
+        window.updateWeekDate = updateWeekDate;
+        window.copyFromPrevious = copyFromPrevious;
+        window.clearWeek = clearWeek;
+        window.clearAll = clearAll;
+        window.generateReport = generateReport;
+        window.filterWeeksByDate = () => {
+            const searchVal = document.getElementById('searchDateInput').value;
+            const blocks = document.querySelectorAll('.week-block');
+            blocks.forEach(block => {
+                const blockDate = block.getAttribute('data-date');
+                if (!searchVal || blockDate === searchVal) block.classList.remove('hidden');
+                else block.classList.add('hidden');
+            });
+        };
+        window.resetFilter = () => {
+            document.getElementById('searchDateInput').value = '';
+            window.filterWeeksByDate();
+        };
+
+    </script>
+</body>
+</html>
