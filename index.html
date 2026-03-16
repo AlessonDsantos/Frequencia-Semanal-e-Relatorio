@@ -39,12 +39,12 @@
 
         h1, h2, h3 { text-align: center; color: var(--primary-color); margin-bottom: 20px; }
 
-        /* Controles Principais */
+        /* ── Controles Principais ── */
         .main-controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         button {
@@ -61,21 +61,63 @@
             gap: 5px;
         }
 
-        .btn-primary { background: var(--primary-color); color: white; }
-        .btn-success { background: var(--success-color); color: white; }
-        .btn-danger { background: var(--danger-color); color: white; }
-        .btn-info { background: #17a2b8; color: white; }
-        .btn-pdf { background: #e74c3c; color: white; }
-        
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary  { background: var(--primary-color); color: white; }
+        .btn-success  { background: var(--success-color); color: white; }
+        .btn-danger   { background: var(--danger-color);  color: white; }
+        .btn-info     { background: #17a2b8; color: white; }
+        .btn-pdf      { background: #e74c3c; color: white; }
+        /* NOVO — botão roxo para Relatório da Semana */
+        .btn-report   { background: #6f42c1; color: white; }
+
+        button:hover   { opacity: 0.9; transform: translateY(-1px); }
         button:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* Busca de Semanas */
+        /* ── Seletor de Período (NOVO) ── */
+        .period-selector-section {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .period-selector-section h4 {
+            margin: 0 0 12px 0;
+            color: #856404;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .period-fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .period-fields label {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+            gap: 4px;
+        }
+
+        .period-fields input[type="date"] {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 0.9rem;
+        }
+
+        /* ── Busca de Semanas ── */
         .search-week-section {
             background: #e9ecef;
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
@@ -89,7 +131,50 @@
             border: 1px solid #ccc;
         }
 
-        /* Bloco de Semana */
+        /* ── Banner de Filtro Ativo (NOVO) ── */
+        .filter-banner {
+            padding: 9px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            border: 1px solid;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .filter-banner.mode-atual {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+
+        .filter-banner.mode-todas {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .filter-banner.mode-data {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        /* ── Estado Vazio (NOVO) ── */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state h3 { color: #aaa; font-size: 1.2rem; }
+        .empty-state p  { font-size: 0.9rem; line-height: 1.6; }
+
+        /* ── Bloco de Semana ── */
         .week-block {
             border: 1px solid var(--border-color);
             border-radius: 10px;
@@ -106,7 +191,7 @@
 
         .week-title { font-size: 1.2rem; font-weight: bold; color: #444; }
 
-        /* Dashboard da Semana */
+        /* ── Dashboard da Semana ── */
         .week-stats {
             display: flex;
             justify-content: space-around;
@@ -121,7 +206,7 @@
 
         .stat-item b { color: var(--primary-color); }
 
-        /* Tabela de Presença Responsiva */
+        /* ── Tabela de Presença ── */
         .table-wrapper { overflow-x: auto; }
 
         table { width: 100%; border-collapse: collapse; min-width: 400px; }
@@ -129,10 +214,10 @@
         th { background: #f1f3f5; font-size: 0.85rem; }
 
         .name-input { width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; }
-        
+
         select.cat-select { padding: 6px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.8rem; }
 
-        /* Botões Compactos ✔/❌ */
+        /* ── Botões de Status ── */
         .btn-status {
             width: 32px;
             height: 32px;
@@ -142,12 +227,12 @@
         }
 
         .status-present { background: var(--success-color); color: white; }
-        .status-absent { background: var(--danger-color); color: white; }
+        .status-absent  { background: var(--danger-color);  color: white; }
 
-        /* Relatórios */
+        /* ── Área de Relatório ── */
         .report-area { margin-top: 40px; display: none; width: 100%; }
         .report-card { background: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        
+
         .cat-badge {
             display: inline-block;
             padding: 2px 6px;
@@ -172,14 +257,54 @@
             font-size: 0.85rem;
         }
 
-        .summary-box h4 { margin: 0 0 10px 0; font-size: 0.9rem; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        .summary-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+        .summary-box h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
 
-        /* Estilos de Impressão (PDF) */
+        .summary-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* ── Grade de Nomes no Relatório (NOVO) ── */
+        .report-names-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .report-names-col h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+            padding-bottom: 5px;
+            border-bottom: 2px solid;
+        }
+
+        .report-names-col.presentes h4 { color: var(--success-color); border-color: var(--success-color); }
+        .report-names-col.faltas h4    { color: var(--danger-color);   border-color: var(--danger-color); }
+
+        .report-names-col ul { padding-left: 20px; margin: 0; font-size: 0.85rem; }
+        .report-names-col li { padding: 3px 0; }
+
+        /* ── Impressão (PDF) ── */
         @media print {
             body { background: white; padding: 0; }
             .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
-            .main-controls, .search-week-section, #weeksContainer, .btn-pdf, .btn-danger, .btn-info, .btn-success, .btn-primary {
+            .main-controls,
+            .period-selector-section,
+            .search-week-section,
+            .filter-banner,
+            #weeksContainer,
+            .btn-pdf, .btn-danger, .btn-info,
+            .btn-success, .btn-primary, .btn-report {
                 display: none !important;
             }
             .report-area { display: block !important; margin-top: 0; }
@@ -187,7 +312,7 @@
             h1, h2 { color: black; }
         }
 
-        /* Mobile Adjustments */
+        /* ── Mobile ── */
         @media (max-width: 600px) {
             body { padding: 10px; }
             .container { padding: 15px; }
@@ -195,16 +320,23 @@
             .name-input { font-size: 0.85rem; }
             .week-stats { flex-direction: column; align-items: center; }
             .report-summary { grid-template-columns: 1fr; }
+            .report-names-grid { grid-template-columns: 1fr; }
+            .period-fields { flex-direction: column; align-items: stretch; }
         }
 
         .hidden { display: none !important; }
 
         #loadingOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8);
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255,255,255,0.85);
             display: flex; justify-content: center; align-items: center;
             z-index: 9999;
+            flex-direction: column;
+            gap: 10px;
         }
+
+        #loadingOverlay h3 { color: var(--primary-color); }
     </style>
 </head>
 <body>
@@ -215,65 +347,99 @@
 
     <div class="container">
         <h1>Frequência Semanal</h1>
-        
+
+        <!-- ── Botões Principais ── -->
         <div class="main-controls">
-            <button class="btn-primary" onclick="window.addWeek()">+ Nova Semana</button>
-            <button class="btn-success" onclick="window.generateReport()">Gerar Relatório</button>
-            <button class="btn-danger" onclick="window.clearAll()">Limpar Tudo</button>
+            <button class="btn-primary"  onclick="window.addWeek()">➕ Nova Semana</button>
+            <button class="btn-success"  onclick="window.abrirSeletorPeriodo()">📅 Gerar Relatório</button>
+            <button class="btn-danger"   onclick="window.clearAll()">🗑 Limpar Tudo</button>
         </div>
 
+        <!-- ── Seletor de Período (oculto por padrão) — MUDANÇA 2 ── -->
+        <div id="periodoSection" class="period-selector-section hidden">
+            <h4>📅 Relatório por Período</h4>
+            <div class="period-fields">
+                <label>
+                    Data inicial
+                    <input type="date" id="dataInicio">
+                </label>
+                <label>
+                    Data final
+                    <input type="date" id="dataFim">
+                </label>
+                <button class="btn-success" style="height:38px;" onclick="window.gerarRelatorioPeriodo()">📊 Gerar</button>
+                <button class="btn-danger"  style="height:38px; padding: 0 14px;" onclick="window.fecharSeletorPeriodo()">✕ Cancelar</button>
+            </div>
+        </div>
+
+        <!-- ── Busca por Data ── -->
         <div class="search-week-section">
             <label>🔍 Buscar semana por data:</label>
             <input type="date" id="searchDateInput" onchange="window.filterWeeksByDate()">
             <button class="btn-info" style="padding: 5px 10px;" onclick="window.resetFilter()">Ver Todas</button>
         </div>
 
-        <div id="weeksContainer">
-            <!-- Semanas serão renderizadas aqui -->
+        <!-- ── Banner de Filtro Ativo — MUDANÇA 1 ── -->
+        <div id="filterBanner" class="filter-banner mode-atual">
+            <span id="filterBannerText">📅 Mostrando apenas a semana atual</span>
+            <button class="btn-info" style="padding: 4px 10px; font-size: 0.8rem;" onclick="window.resetFilter()">Ver Todas</button>
         </div>
 
+        <!-- ── Container das Semanas ── -->
+        <div id="weeksContainer"></div>
+
+        <!-- ── Seção de Relatório ── -->
         <div id="reportSection" class="report-area">
             <hr>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0;">Relatório de Frequência</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                <h2 style="margin:0;">Relatório de Frequência</h2>
                 <button class="btn-pdf" onclick="window.print()">📄 Salvar PDF</button>
             </div>
             <div id="reportContent"></div>
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- ── Firebase SDKs ── -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+        import { initializeApp }   from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc,
+                 doc, updateDoc, query, orderBy, onSnapshot }
+                 from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
-        // Configuração do Firebase
+        /* ═══════════════════════════════════════════
+           CONFIGURAÇÃO DO FIREBASE
+        ═══════════════════════════════════════════ */
         const firebaseConfig = {
-            apiKey: "AIzaSyBKbFgrivWgaKkWsdM6qdgb3JPgRpa1yv4",
-            authDomain: "controle-de-fraquencia.firebaseapp.com",
-            projectId: "controle-de-fraquencia",
-            storageBucket: "controle-de-fraquencia.firebasestorage.app",
+            apiKey:            "AIzaSyBKbFgrivWgaKkWsdM6qdgb3JPgRpa1yv4",
+            authDomain:        "controle-de-fraquencia.firebaseapp.com",
+            projectId:         "controle-de-fraquencia",
+            storageBucket:     "controle-de-fraquencia.firebasestorage.app",
             messagingSenderId: "1026228007121",
-            appId: "1:1026228007121:web:f454b77f3e99dea86655f0"
+            appId:             "1:1026228007121:web:f454b77f3e99dea86655f0"
         };
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const app            = initializeApp(firebaseConfig);
+        const db             = getFirestore(app);
         const weeksCollection = collection(db, "semanas");
 
         const CATEGORIES = ["ORM", "JAS", "ADUL", "PRIM"];
         let appData = { weeks: [] };
 
-        // --- FUNÇÕES DE INTERAÇÃO COM FIRESTORE ---
+        /* ═══════════════════════════════════════════
+           ESTADO DO FILTRO  — MUDANÇA 1
+           'semanaAtual' | 'todas' | 'data'
+        ═══════════════════════════════════════════ */
+        let filtroAtivo = 'semanaAtual';
+        let filtroData  = '';
 
-        // Carregar dados em tempo real
+        /* ═══════════════════════════════════════════
+           FIREBASE — CRUD
+        ═══════════════════════════════════════════ */
+
+        // Listener em tempo real
         const q = query(weeksCollection, orderBy("date", "asc"));
         onSnapshot(q, (snapshot) => {
-            appData.weeks = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            appData.weeks = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
             renderAll();
             document.getElementById('loadingOverlay').style.display = 'none';
         });
@@ -281,14 +447,16 @@
         async function addWeek() {
             let nextDate = new Date();
             if (appData.weeks.length > 0) {
-                const lastDate = new Date(appData.weeks[appData.weeks.length - 1].date);
+                const lastDate = new Date(appData.weeks[appData.weeks.length - 1].date + 'T00:00:00');
                 lastDate.setDate(lastDate.getDate() + 7);
                 nextDate = lastDate;
             }
-            const dateStr = nextDate.toISOString().split('T')[0];
-            
+            // Formata sem problemas de fuso horário
+            const y = nextDate.getFullYear();
+            const m = String(nextDate.getMonth() + 1).padStart(2, '0');
+            const d = String(nextDate.getDate()).padStart(2, '0');
             await addDoc(weeksCollection, {
-                date: dateStr,
+                date: `${y}-${m}-${d}`,
                 records: [{ name: "", category: "ORM", present: true }]
             });
         }
@@ -339,58 +507,122 @@
         async function clearAll() {
             if (confirm("Apagar TUDO do Firebase permanentemente?")) {
                 const snapshot = await getDocs(weeksCollection);
-                const deletePromises = snapshot.docs.map(d => deleteDoc(doc(db, "semanas", d.id)));
-                await Promise.all(deletePromises);
+                await Promise.all(snapshot.docs.map(d => deleteDoc(doc(db, "semanas", d.id))));
                 addWeek();
             }
         }
 
-        // --- FUNÇÕES DE RENDERIZAÇÃO E UI ---
+        /* ═══════════════════════════════════════════
+           LÓGICA DE FILTRO — MUDANÇA 1
+        ═══════════════════════════════════════════ */
+
+        /**
+         * Verifica se a data da semana corresponde à semana atual.
+         * A semana vai do `dataSemana` até `dataSemana + 6 dias`.
+         */
+        function ehSemanaAtual(dataSemana) {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            const [y, m, d] = dataSemana.split('-').map(Number);
+            const inicioSemana = new Date(y, m - 1, d);
+            const fimSemana   = new Date(y, m - 1, d + 6);
+            return hoje >= inicioSemana && hoje <= fimSemana;
+        }
+
+        /** Retorna as semanas de acordo com o filtro ativo */
+        function getWeeksFiltradas() {
+            if (filtroAtivo === 'todas') return appData.weeks;
+            if (filtroAtivo === 'data')  return appData.weeks.filter(w => w.date === filtroData);
+            // padrão: semanaAtual
+            return appData.weeks.filter(w => ehSemanaAtual(w.date));
+        }
+
+        /* ═══════════════════════════════════════════
+           RENDERIZAÇÃO
+        ═══════════════════════════════════════════ */
 
         function renderAll() {
-            const container = document.getElementById('weeksContainer');
-            container.innerHTML = '';
+            const container      = document.getElementById('weeksContainer');
+            container.innerHTML  = '';
+            const weeksFiltradas = getWeeksFiltradas();
 
-            appData.weeks.forEach((week, wIdx) => {
-                const total = week.records.filter(r => r.name.trim() !== "").length;
+            // Atualiza o banner
+            atualizarBanner();
+
+            // Estado vazio
+            if (weeksFiltradas.length === 0) {
+                const msg = filtroAtivo === 'semanaAtual'
+                    ? `<p>Não há semana cadastrada para a data de hoje.<br>
+                       Clique em <b>"➕ Nova Semana"</b> para criar uma,<br>
+                       ou em <b>"Ver Todas"</b> para ver semanas anteriores.</p>`
+                    : `<p>Nenhuma semana encontrada para o filtro aplicado.</p>`;
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📭 Nenhuma semana encontrada</h3>
+                        ${msg}
+                    </div>`;
+                return;
+            }
+
+            weeksFiltradas.forEach((week) => {
+                // Índice real (para "Copiar Anterior")
+                const wIdx   = appData.weeks.findIndex(w => w.id === week.id);
+                const total   = week.records.filter(r => r.name.trim() !== "").length;
                 const presents = week.records.filter(r => r.name.trim() !== "" && r.present).length;
-                const absents = total - presents;
+                const absents  = total - presents;
 
                 const block = document.createElement('div');
                 block.className = 'week-block';
                 block.setAttribute('data-date', week.date);
-                
-                let rows = week.records.map((r, i) => `
+
+                const rows = week.records.map((r, i) => `
                     <tr>
                         <td>
-                            <input type="text" class="name-input" value="${r.name}" 
-                                   onchange="window.updateField('${week.id}', ${i}, 'name', this.value)" placeholder="Nome...">
+                            <input type="text" class="name-input" value="${escHtml(r.name)}"
+                                   onchange="window.updateField('${week.id}', ${i}, 'name', this.value)"
+                                   placeholder="Nome...">
                         </td>
                         <td>
-                            <select class="cat-select" onchange="window.updateField('${week.id}', ${i}, 'category', this.value)">
+                            <select class="cat-select"
+                                    onchange="window.updateField('${week.id}', ${i}, 'category', this.value)">
                                 ${CATEGORIES.map(c => `<option value="${c}" ${r.category === c ? 'selected' : ''}>${c}</option>`).join('')}
                             </select>
                         </td>
                         <td>
-                            <button class="btn-status ${r.present ? 'status-present' : 'status-absent'}" 
+                            <button class="btn-status ${r.present ? 'status-present' : 'status-absent'}"
                                     onclick="window.updateField('${week.id}', ${i}, 'present', ${!r.present})">
                                 ${r.present ? '✔' : '❌'}
                             </button>
                         </td>
                         <td>
-                            <button class="btn-danger" style="padding: 5px; width: 30px;" onclick="window.removePerson('${week.id}', ${i})">&times;</button>
+                            <button class="btn-danger" style="padding:5px; width:30px;"
+                                    onclick="window.removePerson('${week.id}', ${i})">&times;</button>
                         </td>
-                    </tr>
-                `).join('');
+                    </tr>`).join('');
 
                 block.innerHTML = `
                     <div class="week-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                            <div class="week-title">Semana - <input type="date" value="${week.date}" onchange="window.updateWeekDate('${week.id}', this.value)" style="border:none; font-size:1.1rem; font-weight:bold; color:#4a90e2; cursor:pointer;"></div>
-                            <div style="display: flex; gap: 5px;">
-                                ${wIdx > 0 ? `<button class="btn-info" style="font-size: 0.75rem; padding: 5px 10px;" onclick="window.copyFromPrevious('${week.id}')">📋 Copiar Anterior</button>` : ''}
-                                <button class="btn-primary" style="font-size: 0.75rem; padding: 5px 10px;" onclick="window.addPerson('${week.id}')">+ Nome</button>
-                                <button class="btn-danger" style="font-size: 0.75rem; padding: 5px 10px;" onclick="window.clearWeek('${week.id}')">Limpar</button>
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                            <div class="week-title">
+                                Semana —
+                                <input type="date" value="${week.date}"
+                                       onchange="window.updateWeekDate('${week.id}', this.value)"
+                                       style="border:none; font-size:1.1rem; font-weight:bold; color:#4a90e2; cursor:pointer;">
+                            </div>
+                            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                                ${wIdx > 0
+                                    ? `<button class="btn-info" style="font-size:0.75rem; padding:5px 10px;"
+                                               onclick="window.copyFromPrevious('${week.id}')">📋 Copiar Anterior</button>`
+                                    : ''}
+                                <button class="btn-primary" style="font-size:0.75rem; padding:5px 10px;"
+                                        onclick="window.addPerson('${week.id}')">+ Nome</button>
+
+                                <!-- MUDANÇA 3 — Botão Relatório da Semana -->
+                                <button class="btn-report" style="font-size:0.75rem; padding:5px 10px;"
+                                        onclick="window.gerarRelatorioSemana('${week.id}')">📊 Relatório da Semana</button>
+
+                                <button class="btn-danger" style="font-size:0.75rem; padding:5px 10px;"
+                                        onclick="window.clearWeek('${week.id}')">Limpar</button>
                             </div>
                         </div>
                     </div>
@@ -404,101 +636,234 @@
                             <thead>
                                 <tr>
                                     <th>Nome</th>
-                                    <th style="width: 80px;">Cat.</th>
-                                    <th style="width: 60px;">Status</th>
-                                    <th style="width: 40px;">-</th>
+                                    <th style="width:80px;">Cat.</th>
+                                    <th style="width:60px;">Status</th>
+                                    <th style="width:40px;">-</th>
                                 </tr>
                             </thead>
                             <tbody>${rows}</tbody>
                         </table>
-                    </div>
-                `;
+                    </div>`;
                 container.appendChild(block);
             });
         }
 
-        function generateReport() {
+        /** Atualiza texto e estilo do banner de filtro */
+        function atualizarBanner() {
+            const banner     = document.getElementById('filterBanner');
+            const bannerText = document.getElementById('filterBannerText');
+
+            banner.classList.remove('mode-atual', 'mode-todas', 'mode-data');
+
+            if (filtroAtivo === 'semanaAtual') {
+                banner.classList.add('mode-atual');
+                bannerText.textContent = '📅 Mostrando apenas a semana atual';
+            } else if (filtroAtivo === 'data') {
+                banner.classList.add('mode-data');
+                bannerText.textContent = `🔍 Filtrando por data: ${formatDate(filtroData)}`;
+            } else {
+                banner.classList.add('mode-todas');
+                bannerText.textContent = '📋 Mostrando todas as semanas';
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+           RELATÓRIOS — MUDANÇAS 2 e 3
+        ═══════════════════════════════════════════ */
+
+        /**
+         * Constrói e exibe um relatório a partir de um array de semanas.
+         * Usado tanto pelo relatório por período quanto pelo da semana.
+         */
+        function buildRelatorio(semanas, titulo, subtitulo = '') {
             const reportContent = document.getElementById('reportContent');
             reportContent.innerHTML = '';
 
-            appData.weeks.forEach(week => {
-                const total = week.records.filter(r => r.name.trim() !== "").length;
-                if (total === 0) return;
-
-                const presentCounts = {};
-                const absentCounts = {};
-                CATEGORIES.forEach(c => {
-                    presentCounts[c] = 0;
-                    absentCounts[c] = 0;
+            // Coleta todos os registros com nome preenchido
+            const allRecords = [];
+            semanas.forEach(week => {
+                week.records.forEach(r => {
+                    if (r.name.trim() !== '') {
+                        allRecords.push({ ...r, weekDate: week.date });
+                    }
                 });
-                
-                const namesList = week.records
-                    .filter(r => r.name.trim() !== "")
-                    .map(r => {
-                        if (r.present) {
-                            presentCounts[r.category]++;
-                        } else {
-                            absentCounts[r.category]++;
-                        }
-                        return `<li>${r.name} <span class="cat-badge">${r.category}</span> - <b style="color:${r.present ? 'var(--success-color)' : 'var(--danger-color)'}">${r.present ? 'Presente' : 'Falta'}</b></li>`;
-                    }).join('');
-
-                const card = document.createElement('div');
-                card.className = 'report-card';
-                card.innerHTML = `
-                    <h3>Semana - ${formatDate(week.date)}</h3>
-                    <p><b>Total de pessoas:</b> ${total}</p>
-                    <div class="report-summary">
-                        <div class="summary-box">
-                            <h4>Resumo de Presentes</h4>
-                            <ul class="summary-list">
-                                ${CATEGORIES.map(c => `<li>${c}: <b>${presentCounts[c]}</b></li>`).join('')}
-                            </ul>
-                        </div>
-                        <div class="summary-box">
-                            <h4>Resumo de Faltas</h4>
-                            <ul class="summary-list">
-                                ${CATEGORIES.map(c => `<li>${c}: <b>${absentCounts[c]}</b></li>`).join('')}
-                            </ul>
-                        </div>
-                    </div>
-                    <hr>
-                    <ul style="padding-left: 20px;">${namesList}</ul>
-                `;
-                reportContent.appendChild(card);
             });
 
+            if (allRecords.length === 0) {
+                reportContent.innerHTML = `
+                    <div style="text-align:center; padding:30px; color:#999;">
+                        <p>Nenhum registro encontrado para o período selecionado.</p>
+                    </div>`;
+                document.getElementById('reportSection').style.display = 'block';
+                document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            const total = allRecords.length;
+
+            // Contagem por categoria (total, independente de presença)
+            const catCounts = {};
+            CATEGORIES.forEach(c => catCounts[c] = 0);
+            allRecords.forEach(r => {
+                if (catCounts[r.category] !== undefined) catCounts[r.category]++;
+            });
+
+            const presentes = allRecords.filter(r =>  r.present);
+            const faltas    = allRecords.filter(r => !r.present);
+
+            const card = document.createElement('div');
+            card.className = 'report-card';
+            card.innerHTML = `
+                <h3>${titulo}</h3>
+                ${subtitulo
+                    ? `<p style="text-align:center; color:#666; margin-top:-12px; margin-bottom:15px; font-size:0.95rem;">${subtitulo}</p>`
+                    : ''}
+
+                <div class="report-summary">
+                    <div class="summary-box">
+                        <h4>📊 Por Categoria &nbsp;<small style="font-weight:normal;">(Total: ${total})</small></h4>
+                        <ul class="summary-list">
+                            ${CATEGORIES.map(c => `<li>${c}: <b>${catCounts[c]}</b></li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="summary-box">
+                        <h4>📋 Resumo Geral</h4>
+                        <ul class="summary-list">
+                            <li>✔ Presentes: <b style="color:var(--success-color)">${presentes.length}</b></li>
+                            <li>❌ Faltas: <b style="color:var(--danger-color)">${faltas.length}</b></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="report-names-grid">
+                    <div class="report-names-col presentes">
+                        <h4>✔ Presentes (${presentes.length})</h4>
+                        <ul>
+                            ${presentes.length
+                                ? presentes.map(r => `<li>${escHtml(r.name)} <span class="cat-badge">${r.category}</span></li>`).join('')
+                                : '<li style="color:#999">Nenhum presente</li>'}
+                        </ul>
+                    </div>
+                    <div class="report-names-col faltas">
+                        <h4>❌ Faltas (${faltas.length})</h4>
+                        <ul>
+                            ${faltas.length
+                                ? faltas.map(r => `<li>${escHtml(r.name)} <span class="cat-badge">${r.category}</span></li>`).join('')
+                                : '<li style="color:#999">Nenhuma falta</li>'}
+                        </ul>
+                    </div>
+                </div>`;
+
+            reportContent.appendChild(card);
             document.getElementById('reportSection').style.display = 'block';
             document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
         }
+
+        /* ── Seletor de Período ── */
+
+        function abrirSeletorPeriodo() {
+            const section = document.getElementById('periodoSection');
+            const jaAberto = !section.classList.contains('hidden');
+            section.classList.toggle('hidden');
+            if (!jaAberto) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function fecharSeletorPeriodo() {
+            document.getElementById('periodoSection').classList.add('hidden');
+        }
+
+        /* ── MUDANÇA 2: Relatório por Período ── */
+        function gerarRelatorioPeriodo() {
+            const dataInicio = document.getElementById('dataInicio').value;
+            const dataFim    = document.getElementById('dataFim').value;
+
+            if (!dataInicio || !dataFim) {
+                alert('Por favor, selecione a data inicial e a data final.');
+                return;
+            }
+            if (dataInicio > dataFim) {
+                alert('A data inicial deve ser anterior ou igual à data final.');
+                return;
+            }
+
+            // Filtra semanas cujo início cai dentro do período (comparação ISO YYYY-MM-DD)
+            const semanasFiltradas = appData.weeks.filter(w =>
+                w.date >= dataInicio && w.date <= dataFim
+            );
+
+            fecharSeletorPeriodo();
+            buildRelatorio(
+                semanasFiltradas,
+                '📅 Relatório de Frequência',
+                `Período: ${formatDate(dataInicio)} até ${formatDate(dataFim)}`
+            );
+        }
+
+        /* ── MUDANÇA 3: Relatório da Semana ── */
+        function gerarRelatorioSemana(weekId) {
+            const week = appData.weeks.find(w => w.id === weekId);
+            if (!week) return;
+            buildRelatorio(
+                [week],
+                '📊 Relatório da Semana',
+                `Semana de ${formatDate(week.date)}`
+            );
+        }
+
+        /* ═══════════════════════════════════════════
+           UTILITÁRIOS
+        ═══════════════════════════════════════════ */
 
         function formatDate(dateStr) {
             const [y, m, d] = dateStr.split('-');
             return `${d}/${m}/${y}`;
         }
 
-        // Exportar funções para o escopo global (window)
-        window.addWeek = addWeek;
-        window.addPerson = addPerson;
-        window.removePerson = removePerson;
-        window.updateField = updateField;
-        window.updateWeekDate = updateWeekDate;
-        window.copyFromPrevious = copyFromPrevious;
-        window.clearWeek = clearWeek;
-        window.clearAll = clearAll;
-        window.generateReport = generateReport;
+        /** Previne XSS em nomes digitados pelo usuário */
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        /* ═══════════════════════════════════════════
+           EXPORTAR PARA WINDOW (acesso inline via HTML)
+        ═══════════════════════════════════════════ */
+        window.addWeek              = addWeek;
+        window.addPerson            = addPerson;
+        window.removePerson         = removePerson;
+        window.updateField          = updateField;
+        window.updateWeekDate       = updateWeekDate;
+        window.copyFromPrevious     = copyFromPrevious;
+        window.clearWeek            = clearWeek;
+        window.clearAll             = clearAll;
+        window.abrirSeletorPeriodo  = abrirSeletorPeriodo;
+        window.fecharSeletorPeriodo = fecharSeletorPeriodo;
+        window.gerarRelatorioPeriodo = gerarRelatorioPeriodo;
+        window.gerarRelatorioSemana  = gerarRelatorioSemana;
+
+        /* ── Filtros de data (busca rápida por semana) ── */
         window.filterWeeksByDate = () => {
-            const searchVal = document.getElementById('searchDateInput').value;
-            const blocks = document.querySelectorAll('.week-block');
-            blocks.forEach(block => {
-                const blockDate = block.getAttribute('data-date');
-                if (!searchVal || blockDate === searchVal) block.classList.remove('hidden');
-                else block.classList.add('hidden');
-            });
+            const val = document.getElementById('searchDateInput').value;
+            if (val) {
+                filtroAtivo = 'data';
+                filtroData  = val;
+            } else {
+                filtroAtivo = 'semanaAtual';
+            }
+            renderAll();
         };
+
         window.resetFilter = () => {
             document.getElementById('searchDateInput').value = '';
-            window.filterWeeksByDate();
+            filtroAtivo = 'todas';
+            renderAll();
         };
 
     </script>
