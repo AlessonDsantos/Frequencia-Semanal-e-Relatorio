@@ -189,6 +189,45 @@
             margin-bottom: 15px;
         }
 
+        /* ── Busca de nome dentro da semana ── */
+        .week-search {
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .week-search input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .week-search input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.12);
+        }
+
+        .week-search-result {
+            display: none;
+            margin-top: 6px;
+            font-size: 0.78rem;
+            color: #777;
+        }
+
+        .week-search-empty {
+            display: none;
+            text-align: center;
+            padding: 18px 10px;
+            color: #999;
+            font-size: 0.85rem;
+            border: 1px dashed var(--border-color);
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
         .week-title { font-size: 1.2rem; font-weight: bold; color: #444; }
 
         /* ── Dashboard da Semana ── */
@@ -627,13 +666,26 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Busca local: filtra somente os nomes desta semana. -->
+                    <div class="week-search">
+                        <input
+                            type="search"
+                            class="week-name-search"
+                            data-week-id="${week.id}"
+                            placeholder="🔍 Buscar nome nesta semana..."
+                            oninput="window.buscarNomeSemana('${week.id}', this.value)"
+                            autocomplete="off">
+                        <div id="weekSearchResult-${week.id}" class="week-search-result"></div>
+                    </div>
+
                     <div class="week-stats">
                         <div class="stat-item">Total: <b>${total}</b></div>
                         <div class="stat-item">Presentes: <b style="color:var(--success-color)">${presents}</b></div>
                         <div class="stat-item">Faltas: <b style="color:var(--danger-color)">${absents}</b></div>
                     </div>
                     <div class="table-wrapper">
-                        <table>
+                        <table id="weekTable-${week.id}">
                             <thead>
                                 <tr>
                                     <th>Nome</th>
@@ -644,6 +696,9 @@
                             </thead>
                             <tbody>${rows}</tbody>
                         </table>
+                        <div id="weekSearchEmpty-${week.id}" class="week-search-empty">
+                            🔎 Nenhum nome encontrado nesta semana.
+                        </div>
                     </div>`;
                 container.appendChild(block);
             });
@@ -833,6 +888,62 @@
                 .replace(/"/g, '&quot;');
         }
 
+        /**
+         * Filtra visualmente os registros de uma semana pelo nome.
+         *
+         * A busca é somente de apresentação: nenhum dado é alterado no Firestore
+         * e o filtro desaparece quando a semana é renderizada novamente.
+         * A comparação ignora maiúsculas/minúsculas e acentos, permitindo, por
+         * exemplo, encontrar "Joao" ao digitar "João".
+         */
+        function buscarNomeSemana(weekId, termo) {
+            const table = document.getElementById(`weekTable-${weekId}`);
+            const result = document.getElementById(`weekSearchResult-${weekId}`);
+            const empty = document.getElementById(`weekSearchEmpty-${weekId}`);
+
+            if (!table) return;
+
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const busca = normalizarTexto(termo.trim());
+
+            let encontrados = 0;
+
+            rows.forEach(row => {
+                const input = row.querySelector('.name-input');
+                const nome = input ? normalizarTexto(input.value) : '';
+
+                // Linhas sem nome continuam visíveis quando não há busca.
+                const mostrar = !busca || nome.includes(busca);
+
+                row.style.display = mostrar ? '' : 'none';
+                if (mostrar) encontrados++;
+            });
+
+            if (!busca) {
+                result.style.display = 'none';
+                result.textContent = '';
+                empty.style.display = 'none';
+                return;
+            }
+
+            result.style.display = 'block';
+            result.textContent = `${encontrados} ${encontrados === 1 ? 'nome encontrado' : 'nomes encontrados'}.`;
+
+            empty.style.display = encontrados === 0 ? 'block' : 'none';
+        }
+
+        /**
+         * Normaliza texto para uma busca amigável:
+         * - converte para minúsculas;
+         * - remove acentos.
+         */
+        function normalizarTexto(texto) {
+            return String(texto)
+                .toLocaleLowerCase('pt-BR')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+        }
+
         /* ═══════════════════════════════════════════
            EXPORTAR PARA WINDOW (acesso inline via HTML)
         ═══════════════════════════════════════════ */
@@ -848,6 +959,7 @@
         window.fecharSeletorPeriodo = fecharSeletorPeriodo;
         window.gerarRelatorioPeriodo = gerarRelatorioPeriodo;
         window.gerarRelatorioSemana  = gerarRelatorioSemana;
+        window.buscarNomeSemana       = buscarNomeSemana;
 
         /* ── Filtros de data (busca rápida por semana) ── */
         window.filterWeeksByDate = () => {
