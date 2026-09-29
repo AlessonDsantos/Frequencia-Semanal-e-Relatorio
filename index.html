@@ -112,6 +112,32 @@
             font-size: 0.9rem;
         }
 
+        /* ── Relatório individual ── */
+        .individual-selector-section {
+            background: #eaf4fc;
+            border: 1px solid #b6d7f0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .individual-selector-section h4 { margin: 0 0 12px; color: #225b83; text-align: center; }
+        .individual-fields { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: center; }
+        .individual-fields label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; font-weight: 600; color: #444; }
+        .individual-fields input, .individual-fields select {
+            padding: 8px; border-radius: 5px; border: 1px solid #aaa; font-size: 0.9rem;
+            background: white; min-height: 38px;
+        }
+        .individual-fields input[type="text"] { width: min(100%, 260px); }
+        .individual-fields .name-field { min-width: min(100%, 260px); }
+        .individual-error { color: #ac2635; text-align: center; margin: 12px 0 0; font-size: 0.85rem; }
+        .individual-rate { text-align: center; margin: 18px 0; }
+        .individual-rate strong { display: block; color: var(--success-color); font-size: 2.5rem; }
+        .individual-rate span { color: #555; font-size: 0.9rem; }
+        .individual-history { width: 100%; border-collapse: collapse; min-width: 0; }
+        .individual-history th, .individual-history td { text-align: left; }
+        .individual-history .present { color: var(--success-color); font-weight: 700; }
+        .individual-history .absent { color: var(--danger-color); font-weight: 700; }
+
         /* ── Busca de Semanas ── */
         .search-week-section {
             background: #e9ecef;
@@ -332,6 +358,7 @@
 
         .report-names-col ul { padding-left: 20px; margin: 0; font-size: 0.85rem; }
         .report-names-col li { padding: 3px 0; }
+        .absence-detail { margin-left: 6px; color: var(--danger-color); line-height: 1.45; overflow-wrap: anywhere; }
 
         /* ── Impressão (PDF) ── */
         @media print {
@@ -339,6 +366,7 @@
             .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
             .main-controls,
             .period-selector-section,
+            .individual-selector-section,
             .search-week-section,
             .filter-banner,
             #weeksContainer,
@@ -361,6 +389,8 @@
             .report-summary { grid-template-columns: 1fr; }
             .report-names-grid { grid-template-columns: 1fr; }
             .period-fields { flex-direction: column; align-items: stretch; }
+            .individual-fields { flex-direction: column; align-items: stretch; }
+            .individual-fields input[type="text"] { width: 100%; }
         }
 
         .hidden { display: none !important; }
@@ -392,6 +422,7 @@
             <button class="btn-info" onclick="window.location.reload()">🏠 Início</button>
             <button class="btn-primary"  onclick="window.addWeek()">➕ Nova Semana</button>
             <button class="btn-success"  onclick="window.abrirSeletorPeriodo()">📅 Gerar Relatório</button>
+            <button class="btn-report" onclick="window.abrirRelatorioIndividual()">🔍 Relatório Individual</button>
             <button class="btn-danger"   onclick="window.clearAll()">🗑 Limpar Tudo</button>
         </div>
 
@@ -410,6 +441,32 @@
                 <button class="btn-success" style="height:38px;" onclick="window.gerarRelatorioPeriodo()">📊 Gerar</button>
                 <button class="btn-danger"  style="height:38px; padding: 0 14px;" onclick="window.fecharSeletorPeriodo()">✕ Cancelar</button>
             </div>
+        </div>
+
+        <!-- ── Busca de presença individual ── -->
+        <div id="individualSection" class="individual-selector-section hidden">
+            <h4>🔍 Relatório individual de presença</h4>
+            <div class="individual-fields">
+                <label class="name-field">Nome
+                    <input type="text" id="individualName" list="individualNames" autocomplete="off" placeholder="Digite ou escolha um nome" oninput="window.limparErroIndividual()" onkeydown="if(event.key === 'Enter') window.gerarRelatorioIndividual()">
+                    <datalist id="individualNames"></datalist>
+                </label>
+                <label>Período
+                    <select id="individualScope" onchange="window.alternarPeriodoIndividual()">
+                        <option value="todo">Todo o período</option>
+                        <option value="intervalo">Período determinado</option>
+                    </select>
+                </label>
+                <label class="individual-date-field hidden">Data inicial
+                    <input type="date" id="individualStart">
+                </label>
+                <label class="individual-date-field hidden">Data final
+                    <input type="date" id="individualEnd">
+                </label>
+                <button class="btn-success" onclick="window.gerarRelatorioIndividual()">📊 Gerar</button>
+                <button class="btn-danger" onclick="window.fecharRelatorioIndividual()">✕ Cancelar</button>
+            </div>
+            <p id="individualError" class="individual-error hidden" role="alert"></p>
         </div>
 
         <!-- ── Busca por Data ── -->
@@ -462,7 +519,14 @@
         const db             = getFirestore(app);
         const weeksCollection = collection(db, "semanas");
 
-        const CATEGORIES = ["ORM", "JAS", "ADUL", "PRIM"];
+        const CATEGORIES = [
+            "Sociedade de Socorro",
+            "Quórum de Élderes",
+            "Moças",
+            "Rapazes",
+            "Primária",
+            "Visitantes"
+        ];
         let appData = { weeks: [] };
 
         /* ═══════════════════════════════════════════
@@ -481,6 +545,7 @@
         onSnapshot(q, (snapshot) => {
             appData.weeks = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
             renderAll();
+            atualizarNomesIndividuais();
             document.getElementById('loadingOverlay').style.display = 'none';
         });
 
@@ -495,10 +560,29 @@
             const y = nextDate.getFullYear();
             const m = String(nextDate.getMonth() + 1).padStart(2, '0');
             const d = String(nextDate.getDate()).padStart(2, '0');
-            await addDoc(weeksCollection, {
-                date: `${y}-${m}-${d}`,
-                records: [{ name: "", category: "ORM", present: true }]
-            });
+            const novaData = `${y}-${m}-${d}`;
+            // Seleciona a nova data antes de salvar: o listener em tempo real
+            // mostra a semana criada assim que ela chega, mesmo fora da semana atual.
+            const filtroAnterior = filtroAtivo;
+            const dataAnterior = filtroData;
+            filtroAtivo = 'data';
+            filtroData = novaData;
+            document.getElementById('searchDateInput').value = novaData;
+            try {
+                await addDoc(weeksCollection, {
+                    date: novaData,
+                    records: [{ name: "", category: "ORM", present: true }]
+                });
+                renderAll();
+                document.getElementById('weeksContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (error) {
+                filtroAtivo = filtroAnterior;
+                filtroData = dataAnterior;
+                document.getElementById('searchDateInput').value = filtroAnterior === 'data' ? dataAnterior : '';
+                renderAll();
+                alert('Não foi possível criar a semana. Tente novamente.');
+                console.error(error);
+            }
         }
 
         async function addPerson(weekId) {
@@ -541,6 +625,25 @@
                 await updateDoc(doc(db, "semanas", weekId), {
                     records: [{ name: "", category: "ORM", present: true }]
                 });
+            }
+        }
+
+        async function deleteWeek(weekId) {
+            const week = appData.weeks.find(w => w.id === weekId);
+            if (!week) return;
+            if (!confirm(`Excluir permanentemente a semana de ${formatDate(week.date)} e todos os seus nomes e presenças?`)) return;
+            try {
+                await deleteDoc(doc(db, "semanas", weekId));
+                if (filtroAtivo === 'data' && filtroData === week.date &&
+                    !appData.weeks.some(w => w.id !== weekId && w.date === week.date)) {
+                    filtroAtivo = 'todas';
+                    filtroData = '';
+                    document.getElementById('searchDateInput').value = '';
+                    renderAll();
+                }
+            } catch (error) {
+                alert('Não foi possível excluir a semana. Tente novamente.');
+                console.error(error);
             }
         }
 
@@ -663,6 +766,8 @@
 
                                 <button class="btn-danger" style="font-size:0.75rem; padding:5px 10px;"
                                         onclick="window.clearWeek('${week.id}')">Limpar</button>
+                                <button class="btn-danger" style="font-size:0.75rem; padding:5px 10px;"
+                                        onclick="window.deleteWeek('${week.id}')" title="Excluir esta semana e seus registros">🗑 Excluir Semana</button>
                             </div>
                         </div>
                     </div>
@@ -767,6 +872,35 @@
             const presentes = allRecords.filter(r =>  r.present);
             const faltas    = allRecords.filter(r => !r.present);
 
+            // Em períodos com mais de quatro semanas, reúne as faltas por pessoa.
+            // A taxa considera somente as semanas em que o nome foi registrado.
+            const mostrarDetalhesFaltas = semanas.length > 4;
+            const faltasPorPessoa = new Map();
+            if (mostrarDetalhesFaltas) {
+                allRecords.forEach(r => {
+                    const chave = normalizarTexto(r.name.trim());
+                    if (!faltasPorPessoa.has(chave)) {
+                        faltasPorPessoa.set(chave, {
+                            name: r.name.trim(), category: r.category,
+                            semanasRegistradas: new Set(), datasFaltas: new Set()
+                        });
+                    }
+                    const pessoa = faltasPorPessoa.get(chave);
+                    pessoa.semanasRegistradas.add(r.weekDate);
+                    if (!r.present) pessoa.datasFaltas.add(r.weekDate);
+                });
+            }
+            const pessoasComFalta = [...faltasPorPessoa.values()].filter(pessoa => pessoa.datasFaltas.size > 0);
+            const listaFaltas = mostrarDetalhesFaltas
+                ? pessoasComFalta.map(pessoa => {
+                        const percentual = (100 * pessoa.datasFaltas.size / pessoa.semanasRegistradas.size)
+                            .toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+                        const datas = [...pessoa.datasFaltas].sort().map(formatDate).join(', ');
+                        return `<li>${escHtml(pessoa.name)} <span class="cat-badge">${escHtml(pessoa.category)}</span>
+                            <span class="absence-detail">${datas} · ${percentual}% de faltas</span></li>`;
+                    }).join('')
+                : faltas.map(r => `<li>${escHtml(r.name)} <span class="cat-badge">${escHtml(r.category)}</span></li>`).join('');
+
             const card = document.createElement('div');
             card.className = 'report-card';
             card.innerHTML = `
@@ -803,16 +937,115 @@
                         </ul>
                     </div>
                     <div class="report-names-col faltas">
-                        <h4>❌ Faltas (${faltas.length})</h4>
+                        <h4>❌ ${mostrarDetalhesFaltas ? 'Pessoas com falta' : 'Faltas'} (${mostrarDetalhesFaltas ? pessoasComFalta.length : faltas.length})</h4>
                         <ul>
                             ${faltas.length
-                                ? faltas.map(r => `<li>${escHtml(r.name)} <span class="cat-badge">${r.category}</span></li>`).join('')
+                                ? listaFaltas
                                 : '<li style="color:#999">Nenhuma falta</li>'}
                         </ul>
                     </div>
                 </div>`;
 
             reportContent.appendChild(card);
+            document.getElementById('reportSection').style.display = 'block';
+            document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /* ── Relatório individual: cada semana cadastrada para a pessoa conta uma vez. ── */
+        function atualizarNomesIndividuais() {
+            const nomes = new Map();
+            appData.weeks.forEach(week => (week.records || []).forEach(r => {
+                const nome = String(r.name || '').trim();
+                if (nome && !nomes.has(normalizarTexto(nome))) nomes.set(normalizarTexto(nome), nome);
+            }));
+            document.getElementById('individualNames').innerHTML = [...nomes.values()]
+                .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+                .map(nome => `<option value="${escHtml(nome)}"></option>`).join('');
+        }
+
+        function abrirRelatorioIndividual() {
+            document.getElementById('individualSection').classList.remove('hidden');
+            atualizarNomesIndividuais();
+            document.getElementById('individualSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            document.getElementById('individualName').focus();
+        }
+
+        function fecharRelatorioIndividual() {
+            document.getElementById('individualSection').classList.add('hidden');
+            limparErroIndividual();
+        }
+
+        function alternarPeriodoIndividual() {
+            const intervalo = document.getElementById('individualScope').value === 'intervalo';
+            document.querySelectorAll('.individual-date-field').forEach(field => field.classList.toggle('hidden', !intervalo));
+            limparErroIndividual();
+        }
+
+        function limparErroIndividual() {
+            const error = document.getElementById('individualError');
+            error.textContent = '';
+            error.classList.add('hidden');
+        }
+
+        function erroIndividual(texto) {
+            const error = document.getElementById('individualError');
+            error.textContent = texto;
+            error.classList.remove('hidden');
+        }
+
+        function gerarRelatorioIndividual() {
+            limparErroIndividual();
+            const termo = normalizarTexto(document.getElementById('individualName').value.trim());
+            if (!termo) return erroIndividual('Digite ou escolha um nome.');
+
+            const intervalo = document.getElementById('individualScope').value === 'intervalo';
+            const inicio = document.getElementById('individualStart').value;
+            const fim = document.getElementById('individualEnd').value;
+            if (intervalo && (!inicio || !fim)) return erroIndividual('Selecione a data inicial e a data final.');
+            if (intervalo && inicio > fim) return erroIndividual('A data inicial deve ser anterior ou igual à data final.');
+
+            // Somente as semanas com registro desse nome entram no denominador.
+            // Se houver duas linhas do mesmo nome na mesma semana, conta presença se alguma estiver presente.
+            const historico = appData.weeks
+                .filter(week => !intervalo || (week.date >= inicio && week.date <= fim))
+                .map(week => {
+                    const registros = (week.records || []).filter(r => normalizarTexto(String(r.name || '').trim()) === termo);
+                    if (!registros.length) return null;
+                    return {
+                        date: week.date,
+                        name: String(registros[0].name).trim(),
+                        category: registros[0].category,
+                        present: registros.some(r => r.present)
+                    };
+                })
+                .filter(Boolean)
+                .sort((a, b) => a.date.localeCompare(b.date));
+
+            if (!historico.length) return erroIndividual('Nenhum registro encontrado para esse nome no período selecionado.');
+
+            const presentes = historico.filter(r => r.present).length;
+            const faltas = historico.length - presentes;
+            const percentual = (presentes * 100 / historico.length).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+            const descricao = intervalo
+                ? `Período: ${formatDate(inicio)} até ${formatDate(fim)}`
+                : `Todo o período registrado: ${formatDate(historico[0].date)} até ${formatDate(historico[historico.length - 1].date)}`;
+
+            document.getElementById('reportContent').innerHTML = `
+                <div class="report-card">
+                    <h3>Relatório individual de presença</h3>
+                    <p style="text-align:center; margin:0;"><b>${escHtml(historico[0].name)}</b>
+                        <span class="cat-badge">${escHtml(historico[historico.length - 1].category || '')}</span></p>
+                    <p style="text-align:center; color:#666; font-size:0.9rem;">${descricao}</p>
+                    <div class="individual-rate"><strong>${percentual}%</strong><span>de presença nas semanas em que o nome foi registrado</span></div>
+                    <div class="report-summary">
+                        <div class="summary-box">✔ Presenças: <b>${presentes}</b></div>
+                        <div class="summary-box">❌ Faltas: <b>${faltas}</b> · Total de semanas: <b>${historico.length}</b></div>
+                    </div>
+                    <table class="individual-history">
+                        <thead><tr><th>Data da semana</th><th>Situação</th></tr></thead>
+                        <tbody>${historico.map(r => `<tr><td>${formatDate(r.date)}</td><td class="${r.present ? 'present' : 'absent'}">${r.present ? '✔ Presente' : '❌ Falta'}</td></tr>`).join('')}</tbody>
+                    </table>
+                </div>`;
             document.getElementById('reportSection').style.display = 'block';
             document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
         }
@@ -954,12 +1187,18 @@
         window.updateWeekDate       = updateWeekDate;
         window.copyFromPrevious     = copyFromPrevious;
         window.clearWeek            = clearWeek;
+        window.deleteWeek           = deleteWeek;
         window.clearAll             = clearAll;
         window.abrirSeletorPeriodo  = abrirSeletorPeriodo;
         window.fecharSeletorPeriodo = fecharSeletorPeriodo;
         window.gerarRelatorioPeriodo = gerarRelatorioPeriodo;
         window.gerarRelatorioSemana  = gerarRelatorioSemana;
         window.buscarNomeSemana       = buscarNomeSemana;
+        window.abrirRelatorioIndividual = abrirRelatorioIndividual;
+        window.fecharRelatorioIndividual = fecharRelatorioIndividual;
+        window.alternarPeriodoIndividual = alternarPeriodoIndividual;
+        window.limparErroIndividual = limparErroIndividual;
+        window.gerarRelatorioIndividual = gerarRelatorioIndividual;
 
         /* ── Filtros de data (busca rápida por semana) ── */
         window.filterWeeksByDate = () => {
